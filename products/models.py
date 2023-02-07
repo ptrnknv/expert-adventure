@@ -7,6 +7,10 @@ class ProductCategory(models.Model):
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField(null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'category'
+        verbose_name_plural = 'categories'
+
     def __str__(self):
         return self.name
 
@@ -19,8 +23,20 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products_image')
     category = models.ForeignKey(to=ProductCategory, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = 'product'
+        verbose_name_plural = 'products'
+
     def __str__(self):
         return f'Продукт: {self.name} | Категория: {self.category.name}'
+
+
+class CartQuerySet(models.QuerySet):
+    def total_sum(self):
+        return sum(cart.sum() for cart in self)
+
+    def total_quantity(self):
+        return sum(cart.quantity for cart in self)
 
 
 class Cart(models.Model):
@@ -29,5 +45,10 @@ class Cart(models.Model):
     quantity = models.PositiveSmallIntegerField(default=0)
     created_timestamp = models.DateTimeField(auto_now_add=True)
 
+    objects = CartQuerySet.as_manager()
+
     def __str__(self):
         return f'Корзина для {self.user.username} | Продукт: {self.product.name}'
+
+    def sum(self):
+        return self.product.price * self.quantity
