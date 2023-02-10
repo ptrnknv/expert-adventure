@@ -94,7 +94,7 @@
         <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
             <a class="page-link"
                href="{% if page_obj.has_next %} ?page={{ page_obj.next_page_number }} {% else %} # {% endif %}"
-               tabindex="-1" aria-disabled="true">Слудующая</a>
+               tabindex="-1" aria-disabled="true">Следующая</a>
         </li>
     </ul>
 </nav>

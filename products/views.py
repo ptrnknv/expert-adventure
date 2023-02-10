@@ -4,15 +4,17 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 
 from products.models import Product, ProductCategory, Cart
+from common.views import TitleMixin
 
 
-class IndexView(TemplateView):
+class IndexView(TitleMixin, TemplateView):
     template_name = 'products/index.html'
+    title = 'Store'
 
-    def get_context_data(self, **kwargs):
-        context = super(IndexView, self).get_context_data()
-        context['title'] = 'Store'
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super(IndexView, self).get_context_data()
+    #     context['title'] = 'Store'
+    #     return context
 
 
 # def index(request):
@@ -22,11 +24,12 @@ class IndexView(TemplateView):
 #     return render(request, 'products/index.html', context)
 
 
-class ProductsListView(ListView):
+class ProductsListView(TitleMixin, ListView):
     model = Product
     template_name = 'products/products.html'
     context_object_name = 'products'
     paginate_by = 2
+    title = 'Store - Каталог'
 
     def get_queryset(self):
         query_set = super(ProductsListView, self).get_queryset()
@@ -35,7 +38,6 @@ class ProductsListView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(ProductsListView, self).get_context_data()
-        context['title'] = 'Store - Каталог'
         context['categories'] = ProductCategory.objects.all()
         return context
 
@@ -58,7 +60,7 @@ def cart_add(request, product_id):
     product = Product.objects.get(id=product_id)
     carts = Cart.objects.filter(user=request.user, quantity=1)
 
-    if not carts.exists():
+    if not carts.exists() or product not in carts:
         Cart.objects.create(user=request.user, product=product, quantity=1)
     else:
         cart = carts.first()
