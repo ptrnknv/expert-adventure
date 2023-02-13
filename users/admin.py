@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from products.admin import CartAdmin
+
 from .models import EmailVerification, User
 
 

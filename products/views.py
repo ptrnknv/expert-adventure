@@ -1,10 +1,10 @@
-from django.shortcuts import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 
-from products.models import Product, ProductCategory, Cart
 from common.views import TitleMixin
+from products.models import Cart, Product, ProductCategory
 
 
 class IndexView(TitleMixin, TemplateView):
