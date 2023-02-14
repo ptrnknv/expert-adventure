@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-pepp=+b-586g1_)a-s%z@y4-x=3&d)5#9xfvd7$7_8a@&e-^1j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'testserver',
+    '127.0.0.1',
+]
 
 DOMAIN_NAME = 'http://localhost:8000'
 
