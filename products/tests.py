@@ -2,9 +2,9 @@ from http import HTTPStatus
 
 from django.test import TestCase
 from django.urls import reverse
-from store.wsgi import *
 
 from products.models import Product, ProductCategory
+from store.wsgi import *
 
 
 class IndexViewTestCase(TestCase):
