@@ -19,7 +19,6 @@ class UserRegistrationViewTestCase(TestCase):
 
     def test_user_registration_get(self):
         response = self.client.get(self.path)
-        print(response.context_data['form'])
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.context_data['title'], 'Store - Регистрация')
@@ -29,7 +28,7 @@ class UserRegistrationViewTestCase(TestCase):
         self.assertFalse(User.objects.filter(username=self.username).exists())
         response = self.client.post(self.path, data=self.data)
 
-        # self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertRedirects(response, reverse('users:login'))
         # check creating user
         self.assertTrue(User.objects.filter(username=self.username).exists())
@@ -43,4 +42,4 @@ class UserRegistrationViewTestCase(TestCase):
         response = self.client.post(self.path, self.data)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, 'Пользователь с таким именем уже существует.')
+        self.assertContains(response, 'Пользователь с таким именем уже существует.', html=True)
