@@ -8,9 +8,9 @@ admin.site.register(ProductCategory)
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'quantity', 'category')
-    fields = ('name', 'description', ('price', 'quantity'), 'image', 'category')
+    fields = ('name', 'description', ('price', 'quantity'), 'stripe_product_price_id', 'image', 'category')
     search_fields = ('name',)
-    ordering = ('name',)
+    ordering = ('-name',)
 
 
 class CartAdmin(admin.TabularInline):
