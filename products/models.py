@@ -83,7 +83,7 @@ class Cart(models.Model):
 
     def de_json(self):
         cart_item = {
-            'product name': self.product.name,
+            'product_name': self.product.name,
             'quantity': self.quantity,
             'price': float(self.product.price),
             'sum': float(self.sum())
