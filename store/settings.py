@@ -9,29 +9,59 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import environ
 
 from pathlib import Path
+
+env = environ.Env(
+    DEBUG=bool,
+    SECRET_KEY=str,
+    DOMAIN_NAME=str,
+
+    REDIS_HOST=str,
+    REDIS_PORT=int,
+
+    DATABASE_NAME=str,
+    DATABASE_USER=str,
+    DATABASE_PASSWORD=str,
+    DATABASE_HOST=str,
+    DATABASE_PORT=int,
+
+    EMAIL_HOST=str,
+    EMAIL_PORT=int,
+    EMAIL_HOST_USER=str,
+    EMAIL_HOST_PASSWORD=str,
+    EMAIL_USE_SSL=bool,
+
+    STRIPE_SECRET_KEY=str,
+    STRIPE_PUBLIC=str,
+    STRIKE_WEBHOOK_SECRET=str,
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pepp=+b-586g1_)a-s%z@y4-x=3&d)5#9xfvd7$7_8a@&e-^1j'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [
     'testserver',
     '127.0.0.1',
     'localhost',
+    '5.53.124.41',
+    '0.0.0.0',
 ]
 
-DOMAIN_NAME = 'http://127.0.0.1:8000'
+DOMAIN_NAME = env('DOMAIN_NAME')
 
 # Application definition
 
@@ -42,19 +72,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_extensions',
     'django.contrib.sites',
     'debug_toolbar',
     'django.contrib.humanize',
+    'rest_framework',
 
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
+    'django_extensions',
 
     'products',
     'orders',
     'users',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -94,10 +126,17 @@ INTERNAL_IPS = [
     'localhost',
 ]
 
+# Redis
+
+REDIS_HOST = env('REDIS_HOST')
+REDIS_PORT = env('REDIS_PORT')
+
+# Cache
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}',
     }
 }
 
@@ -107,14 +146,13 @@ CACHES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'store_db',
-        'USER': 'store_username',
-        'PASSWORD': 'store_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -134,7 +172,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -146,14 +183,18 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = (
-    BASE_DIR / 'static',
-)
+
+if DEBUG:
+    STATICFILES_DIRS = (
+        BASE_DIR / 'static',
+    )
+else:
+    STATIC_ROOT = BASE_DIR / 'static'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -171,12 +212,14 @@ LOGIN_REDIRECT_URL = '/'
 
 # Sending emails
 
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'storePython@yandex.ru'
-EMAIL_HOST_PASSWORD = 'hcnxmwyeyofduiey'
-EMAIL_USE_SSL = True
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_PORT = env('EMAIL_PORT')
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_SSL = env('EMAIL_USE_SSL')
 
 # OAuth
 
@@ -199,11 +242,11 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Celery
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
 # Stripe
 
-STRIPE_SECRET_KEY = 'sk_test_51MdXI1AZIh4ZrImrZZmUl39zNSTHjvtxDifbTsdCfdrZPJkoGtcsA4h5i9UMNRMGnqmHd9jn9XPvTRaUQ7UpmqFX00gsOCQHBu'
-STRIPE_PUBLIC = 'pk_test_51MdXI1AZIh4ZrImrl0dispYJc4moIiGag6PpBMyag4lsTa9UzDA1lYTN7Pr1d0BnI0JmDIBlFS2XB8MBFvUIcarZ00xfK2ZIKS'
-STRIKE_WEBHOOK_SECRET = 'whsec_d771bf8f2612adc4106d8be28be09551de8d914e451a87538809efc4f7ff0a6c'
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+STRIPE_PUBLIC = env('STRIPE_PUBLIC')
+STRIKE_WEBHOOK_SECRET = env('STRIKE_WEBHOOK_SECRET')
