@@ -63,16 +63,7 @@ class ProductsListView(TitleMixin, ListView):
 
 @login_required
 def cart_add(request, product_id):
-    product = Product.objects.get(id=product_id)
-    carts = Cart.objects.filter(user=request.user, quantity=1)
-
-    if not carts.exists() or product not in carts:
-        Cart.objects.create(user=request.user, product=product, quantity=1)
-    else:
-        cart = carts.first()
-        cart.quantity += 1
-        cart.save()
-
+    Cart.create_or_update(product_id, request.user)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 

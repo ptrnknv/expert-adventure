@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-import environ
-
 from pathlib import Path
+
+import environ
 
 env = environ.Env(
     DEBUG=bool,
@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django.contrib.humanize',
     'rest_framework',
+    'rest_framework.authtoken',
 
     'allauth',
     'allauth.account',
@@ -256,4 +257,7 @@ STRIKE_WEBHOOK_SECRET = env('STRIKE_WEBHOOK_SECRET')
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 2,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+            'rest_framework.authentication.TokenAuthentication',
+        ],
 }

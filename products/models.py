@@ -88,3 +88,18 @@ class Cart(models.Model):
             'sum': float(self.sum())
         }
         return cart_item
+
+    @classmethod
+    def create_or_update(cls, product_id, user):
+        carts = Cart.objects.filter(user=user, product_id=product_id)
+
+        if not carts.exists():
+            obj = Cart.objects.create(user=user, product_id=product_id, quantity=1)
+            is_created = True
+            return obj, is_created
+        else:
+            cart = carts.first()
+            cart.quantity += 1
+            cart.save()
+            is_created = False
+            return cart, is_created
